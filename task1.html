@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Books Table</title>
+
+<style>
+    table, tr, td, th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+        background-color: rgb(17, 22, 40);
+        color: rgb(255, 255, 255);
+    }
+
+    th, td {
+        padding: 6px;
+        word-wrap: break-word;
+        text-align: center;
+    }
+
+    th {
+        cursor: pointer;
+        font-size: 1em;
+    }
+    img{
+        border-radius: 20%;
+        
+    }
+    button{
+        padding: 1em 1.25em;
+        background-color: rgb(69, 162, 220);
+        color: white;
+        border: 0px;
+        border-radius: 1em;
+        margin: 1em 2em;
+    }
+    #buttons{
+        display: flex;
+        
+        justify-content: center;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="buttons"><button onclick="previous()">Previous</button>
+<button onclick="next()">Next</button><br></div>
+
+<table>
+<thead>
+<tr>
+    <th onclick="sortTable('title')">title</th>
+    <th onclick="sortTable('isbn')">isbn</th>
+    <th onclick="sortTable('pageCount')">pageCount</th>
+    <th onclick="sortTable('authors')">authors</th>
+    <th onclick="sortTable('categories')">categories</th>
+    <th onclick="sortTable('price')">price</th>
+    <th onclick="sortTable('currency')">currency</th>
+    <th onclick="sortTable('discount')">discount</th>
+    <th onclick="sortTable('discountUnits')">discountUnits</th>
+    <th onclick="sortTable('status')">status</th>
+    <th onclick="sortTable('thumbnailUrl')">thumbnailUrl</th>
+    <th onclick="sortTable('publishedDate')">publishedDate</th>
+</tr>
+</thead>
+
+<tbody id="tablebody"></tbody>
+
+</table>
+
+<script>
+
+let books = [];   
+let currentPage = 1;
+let rowsPerPage = 10;
+
+
+
+
+fetch("https://raw.githubusercontent.com/edupoly/mongodb-data-sets/main/books.json")
+.then(res => res.json())
+.then(data => {
+    books = data;
+    displayPage();
+});
+
+
+
+function displayPage(){
+
+    document.getElementById("tablebody").innerHTML = "";
+
+    let start = (currentPage - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+
+    let pageData = books.slice(start, end);
+
+    tablebody(pageData);
+}
+
+function next(){
+    if(currentPage * rowsPerPage < books.length){
+        currentPage++;
+        displayPage();
+    }
+}
+
+function previous(){
+    if(currentPage > 1){
+        currentPage--;
+        displayPage();
+    }
+}
+
+
+
+function tablebody(data){
+
+    document.getElementById("tablebody").innerHTML = "";
+
+    data.forEach(element => {
+
+        var tabletr = document.createElement("tr");
+
+        var tdtitle = document.createElement('td');
+        tdtitle.innerText = element.title ? element.title : "";
+
+        var tdisbn = document.createElement('td');
+        tdisbn.innerText = element.isbn ? element.isbn : "";
+
+        var tdpagecount = document.createElement('td');
+        tdpagecount.innerText = element.pageCount ? element.pageCount : "";
+
+        var tdauthors = document.createElement('td');
+        tdauthors.innerText = element.authors ? element.authors : "";
+
+        var tdcategories = document.createElement('td');
+        tdcategories.innerText = element.categories ? element.categories : "";
+
+        var tdprice = document.createElement('td');
+        tdprice.innerText = element.price ? element.price : "";
+
+        var tdcurrency = document.createElement('td');
+        tdcurrency.innerText = element.currency ? element.currency : "";
+
+        var tddiscount = document.createElement('td');
+        tddiscount.innerText = element.discount ? element.discount : "";
+
+        var tddiscountunits = document.createElement('td');
+        tddiscountunits.innerText = element.discountUnits ? element.discountUnits : "";
+
+        var tdstatus = document.createElement('td');
+        tdstatus.innerText = element.status ? element.status : "";
+
+        var tdthumbnailUrl = document.createElement("td");
+var img = document.createElement("img");
+
+img.src = element.thumbnailUrl ? element.thumbnailUrl : "";
+img.style.width = "70px";
+
+tdthumbnailUrl.appendChild(img);
+
+
+        var tdpublished = document.createElement('td');
+        tdpublished.innerText = element.publishedDate 
+            ? JSON.stringify(element.publishedDate) 
+            : "";
+
+        tabletr.appendChild(tdtitle);
+        tabletr.appendChild(tdisbn);
+        tabletr.appendChild(tdpagecount);
+        tabletr.appendChild(tdauthors);
+        tabletr.appendChild(tdcategories);
+        tabletr.appendChild(tdprice);
+        tabletr.appendChild(tdcurrency);
+        tabletr.appendChild(tddiscount);
+        tabletr.appendChild(tddiscountunits);
+        tabletr.appendChild(tdstatus);
+        tabletr.appendChild(tdthumbnailUrl);
+        tabletr.appendChild(tdpublished);
+
+        document.getElementById("tablebody").appendChild(tabletr);
+    });
+}
+
+
+
+function sortTable(property){
+
+    books.sort((a, b) => {
+
+        
+
+        if (a[property] > b[property]) return 1;
+        if (a[property] < b[property]) return -1;
+        return 0;
+    });
+
+    tablebody(books);
+}
+
+</script>
+
+</body>
+</html>
